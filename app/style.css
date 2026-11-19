@@ -22,8 +22,8 @@ html, body {
 .controls {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  width: 300px;
+  gap: 14px;
+  width: 320px;
   flex: none;
 }
 
@@ -35,7 +35,26 @@ html, body {
 }
 
 .tag { margin: 0; color: #cbb8d6; }
+.steps { margin: 0; font-size: 13px; color: #e8d5f2; }
+.steps strong { color: #ffb347; }
 .hint { margin: 0; font-size: 13px; color: #a68fb5; }
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid #4a2d5e;
+  border-radius: 12px;
+  background: #1d0f2c;
+}
+
+.group legend {
+  font-weight: 700;
+  padding: 0 6px;
+  color: #ffb347;
+}
 
 .field {
   display: flex;
@@ -57,6 +76,16 @@ html, body {
 
 .field input[type="range"] { width: 100%; accent-color: #ff5e8a; }
 
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.check input { accent-color: #ff5e8a; }
+
 .samples {
   display: flex;
   flex-wrap: wrap;
@@ -66,7 +95,8 @@ html, body {
 }
 
 .samples button,
-.panel-btn {
+.panel-btn,
+.layout-btn {
   font: inherit;
   font-weight: 600;
   padding: 7px 12px;
@@ -78,26 +108,58 @@ html, body {
 }
 
 .samples button:hover,
-.panel-btn:hover { border-color: #ff5e8a; }
+.panel-btn:hover,
+.layout-btn:hover { border-color: #ff5e8a; }
 
-.panel-btn.active {
+.panel-btn.active,
+.layout-btn.active {
   background: #ff5e8a;
   border-color: #ff5e8a;
   color: #160a24;
 }
 
+.layouts,
 .panels {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  margin: 0;
-  padding: 0;
-  border: 0;
 }
 
-.panels legend {
-  font-weight: 600;
+.photo-list {
+  margin: 0;
   padding: 0;
-  margin-bottom: 6px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.photo-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid #4a2d5e;
+  border-radius: 8px;
+  background: #241233;
+}
+
+.photo-list li.empty-note {
+  border-style: dashed;
+  color: #a68fb5;
+}
+
+.photo-list button {
+  font: inherit;
+  font-size: 12px;
+  padding: 3px 9px;
+  border: 1px solid #5b3a6e;
+  border-radius: 999px;
+  background: transparent;
+  color: #f5eef7;
+  cursor: pointer;
 }
 
 #exportBtn {
@@ -125,23 +187,27 @@ html, body {
 
 #cover {
   display: block;
-  width: min(78vh, 62vw, 720px);
-  height: auto;
-  aspect-ratio: 1;
+  /* Height-led sizing: the canvas keeps its own export aspect ratio, so a
+     portrait or wide cover never stretches. */
+  height: min(78vh, 720px);
+  width: auto;
+  max-width: 62vw;
   border-radius: 6px;
   box-shadow: 0 12px 44px rgba(0, 0, 0, 0.55);
   cursor: crosshair;
   touch-action: none;
 }
 
-/* Screenshot mode: ?shot=cover shows the cover alone, edge to edge. */
+/* Screenshot mode: ?shot=cover shows the cover alone, edge to edge; the
+   canvas size is set in pixels by shots.js to fit the viewport exactly. */
 body.shot-cover .controls { display: none; }
 body.shot-cover .app { padding: 0; gap: 0; }
 body.shot-cover .stage { position: static; }
 body.shot-cover #cover {
-  /* Keep the square cover square whatever the viewport: letterbox it. */
-  width: min(100vw, 100vh);
-  height: min(100vw, 100vh);
+  width: auto;
+  height: auto;
+  max-width: 100vw;
+  max-height: 100vh;
   margin: auto;
   border-radius: 0;
   box-shadow: none;
@@ -151,5 +217,5 @@ body.shot-cover #cover {
   .app { flex-direction: column; align-items: center; }
   .controls { width: min(100%, 560px); }
   .stage { position: static; }
-  #cover { width: min(94vw, 720px); }
+  #cover { height: auto; width: min(94vw, 720px); max-width: 94vw; }
 }

@@ -21,8 +21,8 @@ const out = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 mkdirSync(out, { recursive: true });
 cpSync(join(here, 'app'), join(out, 'app'), { recursive: true });
 
-// The screenshots: 3 or 4 captures of the app at work, the first by name the
-// exported cover. Session A ships one smoke-test shot; Session B adds the rest.
+// The screenshots: 4 captures of the app at work, the first by name the
+// exported cover (see shots.json for the scenes).
 if (existsSync(join(here, 'screenshots'))) {
   cpSync(join(here, 'screenshots'), join(out, 'screenshots'), { recursive: true });
 } else {
