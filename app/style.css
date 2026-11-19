@@ -1,0 +1,155 @@
+/* Sunset Cover Studio — editor chrome. Dark, warm, sunset-tinted; the cover
+   itself is drawn on canvas (see src/cover.js), so this file only lays out
+   the page around it. */
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: #160a24;
+  color: #f5eef7;
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.app {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 300px;
+  flex: none;
+}
+
+.controls h1 {
+  margin: 0;
+  font-size: 26px;
+  letter-spacing: 0.5px;
+  color: #ffb347;
+}
+
+.tag { margin: 0; color: #cbb8d6; }
+.hint { margin: 0; font-size: 13px; color: #a68fb5; }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.field input[type="text"],
+.field select {
+  font: inherit;
+  font-weight: 400;
+  padding: 8px 10px;
+  border: 1px solid #5b3a6e;
+  border-radius: 8px;
+  background: #241233;
+  color: #f5eef7;
+}
+
+.field input[type="range"] { width: 100%; accent-color: #ff5e8a; }
+
+.samples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.samples button,
+.panel-btn {
+  font: inherit;
+  font-weight: 600;
+  padding: 7px 12px;
+  border: 1px solid #5b3a6e;
+  border-radius: 999px;
+  background: #241233;
+  color: #f5eef7;
+  cursor: pointer;
+}
+
+.samples button:hover,
+.panel-btn:hover { border-color: #ff5e8a; }
+
+.panel-btn.active {
+  background: #ff5e8a;
+  border-color: #ff5e8a;
+  color: #160a24;
+}
+
+.panels {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.panels legend {
+  font-weight: 600;
+  padding: 0;
+  margin-bottom: 6px;
+}
+
+#exportBtn {
+  font: inherit;
+  font-weight: 800;
+  font-size: 16px;
+  padding: 12px;
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #ff7e5f, #ff2e88);
+  color: #fff;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+#exportBtn:hover { filter: brightness(1.1); }
+
+#status { margin: 0; min-height: 1.2em; font-size: 13px; color: #8fe3c0; }
+
+.stage {
+  flex: none;
+  position: sticky;
+  top: 24px;
+}
+
+#cover {
+  display: block;
+  width: min(78vh, 62vw, 720px);
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  box-shadow: 0 12px 44px rgba(0, 0, 0, 0.55);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+/* Screenshot mode: ?shot=cover shows the cover alone, edge to edge. */
+body.shot-cover .controls { display: none; }
+body.shot-cover .app { padding: 0; gap: 0; }
+body.shot-cover .stage { position: static; }
+body.shot-cover #cover {
+  /* Keep the square cover square whatever the viewport: letterbox it. */
+  width: min(100vw, 100vh);
+  height: min(100vw, 100vh);
+  margin: auto;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+@media (max-width: 900px) {
+  .app { flex-direction: column; align-items: center; }
+  .controls { width: min(100%, 560px); }
+  .stage { position: static; }
+  #cover { width: min(94vw, 720px); }
+}
