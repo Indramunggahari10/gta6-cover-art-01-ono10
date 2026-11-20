@@ -1,9 +1,19 @@
-// cover.js — draws the GTA-poster-style cover on a canvas.
-// One layout, three colour grades, all art drawn in code: no Rockstar logo,
-// artwork or font anywhere. System display fonts only ("Arial Black" stack).
-// The cover is a 1080 x 1080 square: a big display title, one hero panel plus
-// two stacked side panels (same photo, different crops), and a credit strip.
-export const COVER_SIZE = 1080;
+// cover.js — draws GTA-poster-style covers on a canvas.
+// Four multi-panel layouts, three colour grades, three export sizes.
+// All art drawn in code: no Rockstar logo, artwork or font anywhere.
+// Lettering uses system fonts only ("Arial Black" stack and friends).
+//
+// Composition (baoyu-cover-image: type scene + typography, palettes warm /
+// vivid / cool, mood bold): a single visual anchor per layout (hero panel
+// offset left, full-bleed billboard, or a strict triptych/grid), 40-60%
+// breathing room around the title band, one bold display title plus one
+// subline, and a warm sunset / neon / dusk grade over every photo.
+
+export const COVER_SIZES = {
+  square: { w: 1080, h: 1080, label: '1080 × 1080' },
+  portrait: { w: 1080, h: 1350, label: '1080 × 1350' },
+  wide: { w: 1920, h: 1080, label: '1920 × 1080' },
+};
 
 export const GRADES = {
   sunset: {
@@ -26,21 +36,104 @@ export const GRADES = {
   },
 };
 
-export const DEFAULT_OPTIONS = {
-  caption: 'VICE CITY NIGHTS',
-  subline: 'SUNSET BOULEVARD',
-  grade: 'sunset',
-  zoom: 1.15,
-  panX: 0,   // -100..100, percent of the photo's spare width
-  panY: 0,   // -100..100, percent of the photo's spare height
-  captionSize: 96,
-  captionY: 118,
+// Caption fonts — system stacks only, nothing vendored, nothing Rockstar.
+export const CAPTION_FONTS = {
+  display: { label: 'Display', stack: '"Arial Black", "Segoe UI", Arial, sans-serif', italic: true, weight: 900 },
+  impact: { label: 'Impact', stack: 'Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif', italic: false, weight: 900 },
+  serif: { label: 'Serif', stack: 'Georgia, "Times New Roman", serif', italic: true, weight: 700 },
+  mono: { label: 'Mono', stack: '"Courier New", Courier, monospace', italic: false, weight: 700 },
 };
 
-// Draw the photo into rect with cover-fit, zoomed around a focus point.
+export const CAPTION_COLORS = {
+  gradient: { label: 'Sunset gradient' },
+  '#ffffff': { label: 'White' },
+  '#ffc93c': { label: 'Gold' },
+  '#7df9ff': { label: 'Cyan' },
+  '#ff2e88': { label: 'Magenta' },
+};
+
+// Layouts are data: panel rects as fractions of W/H, a title anchor and a
+// subline anchor. One renderer draws them all, so the layout picker just
+// swaps the spec. `zoom`/`fx`/`fy` give each panel its own crop flavour.
+export const LAYOUTS = {
+  classic: {
+    label: 'Classic',
+    blurb: 'Tall hero left, two stacked panels right — the Session A poster.',
+    panels: [
+      { x: 0.033, y: 0.169, w: 0.572, h: 0.648, zoom: 1.0, fx: 0, fy: 0, hero: true },
+      { x: 0.628, y: 0.169, w: 0.339, h: 0.315, zoom: 1.45, fx: 0, fy: -60 },
+      { x: 0.628, y: 0.502, w: 0.339, h: 0.315, zoom: 1.2, fx: 0, fy: 55 },
+    ],
+    titleY: 0.109, stripY: 0.844, sublineY: 0.891, footerY: 0.946,
+  },
+  triptych: {
+    label: 'Triptych',
+    blurb: 'Three equal vertical panels — one story in three beats.',
+    panels: [
+      { x: 0.033, y: 0.170, w: 0.300, h: 0.630, zoom: 1.05, fx: -30, fy: 0 },
+      { x: 0.350, y: 0.170, w: 0.300, h: 0.630, zoom: 1.25, fx: 0, fy: -20 },
+      { x: 0.667, y: 0.170, w: 0.300, h: 0.630, zoom: 1.05, fx: 30, fy: 0 },
+    ],
+    titleY: 0.105, stripY: 0.835, sublineY: 0.885, footerY: 0.945,
+  },
+  billboard: {
+    label: 'Billboard',
+    blurb: 'One full-bleed photo, title overlaid at the bottom, inset panel.',
+    panels: [
+      { x: 0, y: 0, w: 1, h: 1, zoom: 1.0, fx: 0, fy: 0, fullBleed: true },
+      { x: 0.700, y: 0.045, w: 0.265, h: 0.290, zoom: 1.3, fx: 0, fy: 0, inset: true },
+    ],
+    titleY: 0.815, stripY: 0.760, sublineY: 0.905, footerY: 0.955,
+    scrim: true,
+  },
+  grid: {
+    label: 'Grid',
+    blurb: 'Four equal panels — a contact sheet of the same day.',
+    panels: [
+      { x: 0.033, y: 0.170, w: 0.462, h: 0.315, zoom: 1.1, fx: -25, fy: -15 },
+      { x: 0.505, y: 0.170, w: 0.462, h: 0.315, zoom: 1.1, fx: 25, fy: -15 },
+      { x: 0.033, y: 0.500, w: 0.462, h: 0.315, zoom: 1.35, fx: 0, fy: 30 },
+      { x: 0.505, y: 0.500, w: 0.462, h: 0.315, zoom: 1.15, fx: 0, fy: 45 },
+    ],
+    titleY: 0.105, stripY: 0.840, sublineY: 0.890, footerY: 0.945,
+  },
+};
+
+export const DEFAULT_OPTIONS = {
+  layout: 'classic',
+  caption: 'VICE CITY NIGHTS',
+  subline: 'SUNSET BOULEVARD',
+  tagline: '',
+  captionFont: 'display',
+  captionColor: 'gradient',
+  captionOutline: true,
+  captionShadow: true,
+  grade: 'sunset',
+  captionSize: 96, // in 1080-square px; scaled by export width
+  captionY: 118,   // in 1080-square px; scaled by export height
+  // panelPhotos[i] = index into the photos array for layout panel i.
+  panelPhotos: [0, 0, 0, 0],
+};
+
+// One photo slot: the image plus its own crop + grade. A photo keeps its
+// settings wherever it is placed, in any layout.
+export function blankPhoto(img, name) {
+  return {
+    img, name,
+    zoom: 1.15, panX: 0, panY: 0,
+    brightness: 1, contrast: 1, saturation: 1,
+  };
+}
+
+// Draw the photo into rect with cover-fit, zoomed around a focus point,
+// then the per-photo grade (brightness / contrast / saturation) via
+// ctx.filter. `photo` is a blankPhoto() slot; null draws nothing.
 export function drawPhotoCover(ctx, photo, rect, zoom, focusX, focusY) {
-  const iw = photo.naturalWidth || photo.width;
-  const ih = photo.naturalHeight || photo.height;
+  if (!photo || !photo.img) return false;
+  const img = photo.img;
+  const iw = img.naturalWidth || img.width;
+  const ih = img.naturalHeight || img.height;
+  if (!iw || !ih) return false;
   const scale = Math.max(rect.w / iw, rect.h / ih) * zoom;
   const dw = iw * scale;
   const dh = ih * scale;
@@ -53,8 +146,10 @@ export function drawPhotoCover(ctx, photo, rect, zoom, focusX, focusY) {
   ctx.beginPath();
   ctx.rect(rect.x, rect.y, rect.w, rect.h);
   ctx.clip();
-  ctx.drawImage(photo, dx, dy, dw, dh);
+  ctx.filter = `brightness(${photo.brightness}) contrast(${photo.contrast}) saturate(${photo.saturation})`;
+  ctx.drawImage(img, dx, dy, dw, dh);
   ctx.restore();
+  return true;
 }
 
 // Warm sunset / neon wash over a photo, clipped to the same rect.
@@ -97,7 +192,7 @@ function drawPanelFrame(ctx, rect, color, width) {
   ctx.restore();
 }
 
-function drawEmptyPanel(ctx, rect, grade) {
+function drawEmptyPanel(ctx, rect, grade, label) {
   const g = ctx.createLinearGradient(rect.x, rect.y, rect.x + rect.w, rect.y + rect.h);
   g.addColorStop(0, '#2b1055');
   g.addColorStop(0.55, '#7b1e6e');
@@ -110,107 +205,171 @@ function drawEmptyPanel(ctx, rect, grade) {
   ctx.font = '700 30px "Arial Black", Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('DROP A PHOTO', rect.x + rect.w / 2, rect.y + rect.h / 2 - 12);
+  ctx.fillText(label || 'DROP A PHOTO', rect.x + rect.w / 2, rect.y + rect.h / 2 - 12);
   ctx.font = '600 19px Arial, sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.65)';
   ctx.fillText('or pick a sample below', rect.x + rect.w / 2, rect.y + rect.h / 2 + 24);
   ctx.restore();
 }
 
-// Big display title with a vertical sunset gradient and a dark outline.
-// Long captions shrink to fit the cover instead of running off its edges.
-export function drawDisplayTitle(ctx, text, cx, y, size, grade) {
-  const family = '"Arial Black", "Segoe UI", Arial, sans-serif';
+// Big display title with a vertical sunset gradient (or a solid colour) and
+// an optional dark outline and drop shadow. Long captions shrink to fit
+// the cover instead of running off its edges.
+export function drawDisplayTitle(ctx, text, cx, y, size, grade, opts = {}) {
+  const fontDef = CAPTION_FONTS[opts.captionFont] || CAPTION_FONTS.display;
+  const style = fontDef.italic ? 'italic' : 'normal';
+  const family = fontDef.stack;
+  const maxWidth = size * 11; // rough cap: ~11x the font size across
   let fitted = size;
   ctx.save();
-  ctx.font = `italic 900 ${fitted}px ${family}`;
-  const maxWidth = COVER_SIZE - 80;
-  while (fitted > 40 && ctx.measureText(text).width > maxWidth) {
+  ctx.font = `${style} ${fontDef.weight} ${fitted}px ${family}`;
+  const limit = opts.maxWidth || maxWidth;
+  while (fitted > 28 && ctx.measureText(text).width > limit) {
     fitted -= 4;
-    ctx.font = `italic 900 ${fitted}px ${family}`;
+    ctx.font = `${style} ${fontDef.weight} ${fitted}px ${family}`;
   }
-  const font = `italic 900 ${fitted}px ${family}`;
+  const font = `${style} ${fontDef.weight} ${fitted}px ${family}`;
   ctx.translate(cx, y);
   ctx.rotate(-0.028); // a slight poster tilt
   ctx.font = font;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  const grad = ctx.createLinearGradient(0, -fitted * 0.55, 0, fitted * 0.55);
-  grad.addColorStop(0, grade.titleTop);
-  grad.addColorStop(0.5, grade.titleMid);
-  grad.addColorStop(1, grade.titleBottom);
-  ctx.lineJoin = 'round';
-  ctx.strokeStyle = 'rgba(20,6,40,0.95)';
-  ctx.lineWidth = Math.max(6, fitted * 0.11);
-  ctx.strokeText(text, 0, 0);
-  ctx.fillStyle = grad;
+  if (opts.shadow !== false) {
+    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+    ctx.shadowBlur = Math.max(6, fitted * 0.12);
+    ctx.shadowOffsetY = Math.max(3, fitted * 0.06);
+  }
+  if (opts.color && opts.color !== 'gradient') {
+    ctx.fillStyle = opts.color;
+  } else {
+    const grad = ctx.createLinearGradient(0, -fitted * 0.55, 0, fitted * 0.55);
+    grad.addColorStop(0, grade.titleTop);
+    grad.addColorStop(0.5, grade.titleMid);
+    grad.addColorStop(1, grade.titleBottom);
+    ctx.fillStyle = grad;
+  }
+  if (opts.outline !== false) {
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'rgba(20,6,40,0.95)';
+    ctx.lineWidth = Math.max(6, fitted * 0.11);
+    ctx.strokeText(text, 0, 0);
+  }
   ctx.fillText(text, 0, 0);
+  ctx.restore();
+  return fitted;
+}
+
+// Small letterspaced line under the title (the optional tagline).
+function drawTagline(ctx, text, cx, y, size, color) {
+  ctx.save();
+  ctx.font = `600 ${size}px "Trebuchet MS", "Segoe UI", Arial, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = color;
+  ctx.fillText(text, cx, y);
   ctx.restore();
 }
 
-// The whole cover. photo may be null (empty state). opts overrides defaults.
-export function drawCover(ctx, photo, opts = {}) {
+// The whole cover at any export size. `photos` is an array of blankPhoto()
+// slots (may be empty); `opts` overrides DEFAULT_OPTIONS. panelPhotos maps
+// each layout panel to a photo slot index.
+export function drawCover(ctx, W, H, photos, opts = {}) {
   const o = { ...DEFAULT_OPTIONS, ...opts };
   const grade = GRADES[o.grade] || GRADES.sunset;
-  const S = COVER_SIZE;
+  const layout = LAYOUTS[o.layout] || LAYOUTS.classic;
+  const sx = W / 1080; // title sizes are authored in 1080-square px
+  const sy = H / 1080;
 
   // Backdrop: deep violet, vignetted.
   ctx.fillStyle = '#1b1035';
-  ctx.fillRect(0, 0, S, S);
-  const vig = ctx.createRadialGradient(S / 2, S / 2, S * 0.28, S / 2, S / 2, S * 0.78);
+  ctx.fillRect(0, 0, W, H);
+  const vig = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.28, W / 2, H / 2, Math.max(W, H) * 0.78);
   vig.addColorStop(0, 'rgba(0,0,0,0)');
   vig.addColorStop(1, 'rgba(8,2,24,0.55)');
   ctx.fillStyle = vig;
-  ctx.fillRect(0, 0, S, S);
+  ctx.fillRect(0, 0, W, H);
 
-  // Title band.
-  drawDisplayTitle(ctx, o.caption.toUpperCase(), S / 2, o.captionY, o.captionSize, grade);
-
-  // Hero panel (left, tall) + two stacked side panels (right).
-  const hero = { x: 36, y: 182, w: 618, h: 700 };
-  const sideTop = { x: 678, y: 182, w: 366, h: 340 };
-  const sideBottom = { x: 678, y: 542, w: 366, h: 340 };
-  if (photo) {
-    drawPhotoCover(ctx, photo, hero, o.zoom, o.panX, o.panY);
-    drawGradeOverlay(ctx, hero, grade);
-    drawPhotoCover(ctx, photo, sideTop, o.zoom * 1.45, -o.panX * 0.5, -60);
-    drawGradeOverlay(ctx, sideTop, grade);
-    drawPhotoCover(ctx, photo, sideBottom, o.zoom * 1.2, o.panX * 0.6, 55);
-    drawGradeOverlay(ctx, sideBottom, grade);
-  } else {
-    drawEmptyPanel(ctx, hero, grade);
-    drawEmptyPanel(ctx, sideTop, grade);
-    drawEmptyPanel(ctx, sideBottom, grade);
+  // Panels.
+  layout.panels.forEach((p, i) => {
+    const rect = { x: p.x * W, y: p.y * H, w: p.w * W, h: p.h * H };
+    const slot = o.panelPhotos[i] ?? 0;
+    const photo = photos[slot] || null;
+    const zoom = (photo ? photo.zoom : 1.15) * p.zoom;
+    const fx = p.fx + (photo ? photo.panX * 0.4 : 0);
+    const fy = p.fy + (photo ? photo.panY * 0.4 : 0);
+    const drawn = drawPhotoCover(ctx, photo, rect, zoom, fx, fy);
+    if (drawn) {
+      drawGradeOverlay(ctx, rect, grade);
+    } else {
+      drawEmptyPanel(ctx, rect, grade, slot > 0 ? 'ADD PHOTO ' + (slot + 1) : undefined);
+    }
+    if (!p.fullBleed) {
+      drawPanelFrame(ctx, rect, p.hero ? grade.frame : grade.accent, p.hero ? 7 * sx : 5 * sx);
+    }
+  });
+  // Poster-print halftone on the first panel's top corner.
+  const first = layout.panels[0];
+  if (first && !first.fullBleed) {
+    drawHalftone(ctx, first.x * W + first.w * W - 96 * sx, first.y * H + 18 * sy, 5, 4, 20 * sx, 'rgba(255,255,255,0.75)');
   }
-  drawPanelFrame(ctx, hero, grade.frame, 7);
-  drawPanelFrame(ctx, sideTop, grade.accent, 5);
-  drawPanelFrame(ctx, sideBottom, grade.accent, 5);
-  drawHalftone(ctx, hero.x + hero.w - 96, hero.y + 18, 5, 4, 20, 'rgba(255,255,255,0.75)');
 
-  // Credit strip: gold rule, subline, studio mark.
+  // Billboard scrim, drawn AFTER the panels so it actually darkens the
+  // full-bleed photo: a gradient up from the bottom so the overlaid title,
+  // tagline and subline stay readable on any photo.
+  if (layout.scrim) {
+    const sc = ctx.createLinearGradient(0, H * 0.55, 0, H);
+    sc.addColorStop(0, 'rgba(10,4,24,0)');
+    sc.addColorStop(1, 'rgba(10,4,24,0.72)');
+    ctx.fillStyle = sc;
+    ctx.fillRect(0, H * 0.55, W, H * 0.45);
+  }
+
+  // Credit strip: colour rule, subline, studio mark.
+  if (!layout.scrim) {
+    ctx.save();
+    ctx.fillStyle = grade.strip;
+    ctx.fillRect(0.033 * W, layout.stripY * H, W * 0.934, 4 * sy);
+    ctx.restore();
+  }
   ctx.save();
-  ctx.fillStyle = grade.strip;
-  ctx.fillRect(36, 912, S - 72, 4);
-  ctx.font = '700 34px "Arial Black", Arial, sans-serif';
+  ctx.font = `700 ${Math.round(34 * sx)}px "Arial Black", Arial, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#ffffff';
-  ctx.fillText(o.subline.toUpperCase(), S / 2, 962);
-  ctx.font = '600 17px Arial, sans-serif';
+  ctx.fillText(o.subline.toUpperCase(), W / 2, layout.sublineY * H);
+  ctx.font = `600 ${Math.round(17 * sx)}px Arial, sans-serif`;
   ctx.textAlign = 'right';
   ctx.fillStyle = 'rgba(255,255,255,0.55)';
-  ctx.fillText('SUNSET COVER STUDIO', S - 40, 1022);
+  ctx.fillText('SUNSET COVER STUDIO', W - 40 * sx, layout.footerY * H);
   ctx.textAlign = 'left';
-  ctx.fillText('1080 × 1080', 40, 1022);
+  ctx.fillText(`${W} × ${H}`, 40 * sx, layout.footerY * H);
   ctx.restore();
+
+  // Title band — drawn last so it sits above the panels. When a tagline
+  // is set, the title lifts a little so the tagline fits in the band
+  // instead of crowding the panels below it.
+  const hasTag = Boolean(o.tagline && o.tagline.trim());
+  const titleSize = o.captionSize * sx;
+  const titleY = (o.captionY / 1080) * H + (layout.titleY - 0.109) * H - (hasTag ? titleSize * 0.32 : 0);
+  const fitted = drawDisplayTitle(ctx, o.caption.toUpperCase(), W / 2, titleY, titleSize, grade, {
+    captionFont: o.captionFont,
+    color: o.captionColor,
+    outline: o.captionOutline,
+    shadow: o.captionShadow,
+    maxWidth: W - 80 * sx,
+  });
+  if (hasTag) {
+    drawTagline(ctx, o.tagline.toUpperCase(), W / 2, titleY + fitted * 0.72, Math.round(26 * sx), 'rgba(255,255,255,0.92)');
+  }
 }
 
-// Render a 1080 x 1080 PNG blob of the current cover.
-export function exportCoverPNG(photo, opts = {}) {
+// Render a PNG blob of the current cover at the requested export size.
+export function exportCoverPNG(photos, opts = {}, sizeKey = 'square') {
+  const size = COVER_SIZES[sizeKey] || COVER_SIZES.square;
   const canvas = document.createElement('canvas');
-  canvas.width = COVER_SIZE;
-  canvas.height = COVER_SIZE;
-  drawCover(canvas.getContext('2d'), photo, opts);
+  canvas.width = size.w;
+  canvas.height = size.h;
+  drawCover(canvas.getContext('2d'), size.w, size.h, photos, opts);
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('PNG encode failed'))), 'image/png');
   });
