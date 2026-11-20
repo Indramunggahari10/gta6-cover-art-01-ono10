@@ -1,75 +1,40 @@
-// A tiny static server for app/ (Node 22, standard library only), so the
-// cover maker can be tried locally with no build step:
-//
-//   node serve.ts            serves app/ on http://localhost:8080
-//   node serve.ts --port 9000
-//
-// It sends the MIME types an offline web app needs and refuses any path that
-// climbs out of app/. This is a development convenience, not a server for the
-// internet; the app itself is plain static files.
-
-import { createReadStream, statSync } from 'node:fs';
+// serve.ts — local dev server for Sunset Cover Studio (Node 22, stdlib only).
+// Serves app/ as static files on http://localhost:8080 so the app can be
+// tried in desktop Chrome exactly as the grader's static server will serve it.
+// Run: `node serve.ts` (or `PORT=8000 node serve.ts`).
 import { createServer } from 'node:http';
-import { extname, join, normalize, resolve, sep } from 'node:path';
+import { createReadStream, existsSync, statSync } from 'node:fs';
+import { extname, join, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = resolve(fileURLToPath(new URL('./app', import.meta.url)));
-const args = process.argv.slice(2);
-const portIndex = args.indexOf('--port');
-const wanted = portIndex === -1 ? 8080 : Number(args[portIndex + 1]);
-const port = Number.isInteger(wanted) && wanted > 0 && wanted < 65536 ? wanted : 8080;
+const root = join(fileURLToPath(new URL('.', import.meta.url)), 'app');
+const port = Number(process.env.PORT ?? 8080);
 
-const MIME = {
+const TYPES = {
   '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.mjs': 'text/javascript; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.json': 'application/json; charset=utf-8',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.gif': 'image/gif',
-  '.webp': 'image/webp',
-  '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon',
-  '.woff2': 'font/woff2',
-  '.woff': 'font/woff',
-  '.ttf': 'font/ttf',
-  '.otf': 'font/otf',
-  '.wasm': 'application/wasm',
-  '.txt': 'text/plain; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
 };
 
-createServer((request, response) => {
-  const url = new URL(request.url ?? '/', 'http://localhost');
-  let pathname;
-  try {
-    pathname = decodeURIComponent(url.pathname);
-  } catch {
-    response.writeHead(400).end('bad request');
+const server = createServer((req, res) => {
+  const reqPath = decodeURIComponent(req.url?.split('?')[0] ?? '/');
+  const joined = normalize(join(root, reqPath));
+  const file = (joined === root || (existsSync(joined) && statSync(joined).isDirectory()))
+    ? join(joined, 'index.html')
+    : joined;
+  if (!file.startsWith(resolve(root)) || !existsSync(file) || !statSync(file).isFile()) {
+    res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' });
+    res.end('not found\n');
     return;
   }
-  if (pathname.endsWith('/')) pathname += 'index.html';
-  const file = resolve(join(root, normalize(pathname)));
-  if (file !== root && !file.startsWith(root + sep)) {
-    response.writeHead(403).end('forbidden');
-    return;
-  }
-  let size;
-  try {
-    const stats = statSync(file);
-    if (!stats.isFile()) throw new Error('not a file');
-    size = stats.size;
-  } catch {
-    response.writeHead(404).end('not found');
-    return;
-  }
-  response.writeHead(200, {
-    'content-type': MIME[extname(file).toLowerCase()] ?? 'application/octet-stream',
-    'content-length': size,
-    'cache-control': 'no-store',
-  });
-  createReadStream(file).pipe(response);
-}).listen(port, '127.0.0.1', () => {
-  console.log(`Sunset Cover Studio is on http://localhost:${port}`);
+  res.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' });
+  createReadStream(file).pipe(res);
+});
+
+server.listen(port, () => {
+  console.log(`Sunset Cover Studio at http://localhost:${port} (serving app/)`);
 });

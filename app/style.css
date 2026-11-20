@@ -1,221 +1,146 @@
-/* Sunset Cover Studio — editor chrome. Dark, warm, sunset-tinted; the cover
-   itself is drawn on canvas (see src/cover.js), so this file only lays out
-   the page around it. */
-
-html, body {
+/* Sunset Cover Studio — editor chrome. Dark violet stage, sunset accents.
+   The cover art itself is drawn on canvas (app/src/cover.js); this file only
+   styles the editor around it. */
+:root {
+  --bg: #120a24;
+  --panel: #1e1238;
+  --panel-2: #261747;
+  --ink: #f5efff;
+  --muted: #b9a8d9;
+  --accent: #ff2e88;
+  --accent-2: #ff7a18;
+  --gold: #ffc93c;
+  --teal: #00e5c7;
+  --line: #3a2560;
+}
+* { box-sizing: border-box; }
+html { color-scheme: dark; }
+body {
   margin: 0;
-  min-height: 100%;
-  background: #160a24;
-  color: #f5eef7;
-  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
 }
-
-.app {
-  display: flex;
-  gap: 28px;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 24px;
-  box-sizing: border-box;
+.topbar {
+  padding: 18px 24px 10px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(90deg, #2b1055, #7b1e6e 55%, #b83a2e);
 }
-
-.controls {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  width: 320px;
-  flex: none;
-}
-
-.controls h1 {
+.topbar h1 {
   margin: 0;
-  font-size: 26px;
+  font: italic 900 30px "Arial Black", Arial, sans-serif;
   letter-spacing: 0.5px;
-  color: #ffb347;
+  text-transform: uppercase;
 }
-
-.tag { margin: 0; color: #cbb8d6; }
-.steps { margin: 0; font-size: 13px; color: #e8d5f2; }
-.steps strong { color: #ffb347; }
-.hint { margin: 0; font-size: 13px; color: #a68fb5; }
-
-.group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin: 0;
-  padding: 14px;
-  border: 1px solid #4a2d5e;
+.tagline { margin: 4px 0 8px; color: #ffe9f4; }
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 20px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 20px 24px;
+}
+.stage { min-width: 0; }
+.dropzone {
+  position: relative;
+  border: 2px dashed var(--line);
   border-radius: 12px;
-  background: #1d0f2c;
+  padding: 10px;
+  background: #0d0618;
+  transition: border-color 0.15s, background 0.15s;
 }
-
-.group legend {
-  font-weight: 700;
-  padding: 0 6px;
-  color: #ffb347;
+.dropzone.dragging { border-color: var(--teal); background: #12283a; }
+.dropzone canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
 }
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-weight: 600;
-}
-
-.field input[type="text"],
-.field select {
-  font: inherit;
-  font-weight: 400;
-  padding: 8px 10px;
-  border: 1px solid #5b3a6e;
-  border-radius: 8px;
-  background: #241233;
-  color: #f5eef7;
-}
-
-.field input[type="range"] { width: 100%; accent-color: #ff5e8a; }
-
-.check {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.check input { accent-color: #ff5e8a; }
-
-.samples {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-}
-
-.samples button,
-.panel-btn,
-.layout-btn {
-  font: inherit;
-  font-weight: 600;
-  padding: 7px 12px;
-  border: 1px solid #5b3a6e;
-  border-radius: 999px;
-  background: #241233;
-  color: #f5eef7;
-  cursor: pointer;
-}
-
-.samples button:hover,
-.panel-btn:hover,
-.layout-btn:hover { border-color: #ff5e8a; }
-
-.panel-btn.active,
-.layout-btn.active {
-  background: #ff5e8a;
-  border-color: #ff5e8a;
-  color: #160a24;
-}
-
-.layouts,
-.panels {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.photo-list {
+.drop-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
   margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(10, 4, 24, 0.82);
+  color: #fff;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.photo-name, .status { color: var(--muted); margin: 10px 2px 0; }
+.status { color: var(--gold); min-height: 1.4em; }
+.controls { display: flex; flex-direction: column; gap: 14px; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.card h2 {
+  margin: 0 0 10px;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--gold);
+}
+.card label { display: block; margin: 10px 0; font-size: 14px; color: var(--muted); }
+.card label output { float: right; color: var(--ink); font-weight: 600; }
+.card input[type="range"] { width: 100%; accent-color: var(--accent); }
+.card input[type="text"] {
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #120a24;
+  color: var(--ink);
+  font: 600 15px system-ui, sans-serif;
+}
+.file-btn {
+  display: inline-block;
+  padding: 9px 16px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+.file-btn:hover { background: #ff4d9d; }
+.samples, .grades { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.sample-btn, .grade-btn {
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-2);
+  color: var(--ink);
+  font: 600 13px system-ui, sans-serif;
+  cursor: pointer;
+  text-transform: capitalize;
+}
+.sample-btn:hover, .grade-btn:hover { border-color: var(--gold); }
+.grade-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.export-btn {
+  padding: 14px 18px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(90deg, var(--accent-2), var(--accent));
+  color: #fff;
+  font: 800 17px system-ui, sans-serif;
+  cursor: pointer;
+}
+.export-btn:hover { filter: brightness(1.1); }
+.export-btn:disabled { opacity: 0.55; cursor: wait; }
+.size-note { color: var(--muted); font-size: 13px; margin: 0 2px; }
+.foot {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px 26px;
+  color: var(--muted);
   font-size: 13px;
 }
-
-.photo-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  border: 1px solid #4a2d5e;
-  border-radius: 8px;
-  background: #241233;
-}
-
-.photo-list li.empty-note {
-  border-style: dashed;
-  color: #a68fb5;
-}
-
-.photo-list button {
-  font: inherit;
-  font-size: 12px;
-  padding: 3px 9px;
-  border: 1px solid #5b3a6e;
-  border-radius: 999px;
-  background: transparent;
-  color: #f5eef7;
-  cursor: pointer;
-}
-
-#exportBtn {
-  font: inherit;
-  font-weight: 800;
-  font-size: 16px;
-  padding: 12px;
-  border: 0;
-  border-radius: 10px;
-  background: linear-gradient(90deg, #ff7e5f, #ff2e88);
-  color: #fff;
-  cursor: pointer;
-  margin-top: 4px;
-}
-
-#exportBtn:hover { filter: brightness(1.1); }
-
-#status { margin: 0; min-height: 1.2em; font-size: 13px; color: #8fe3c0; }
-
-.stage {
-  flex: none;
-  position: sticky;
-  top: 24px;
-}
-
-#cover {
-  display: block;
-  /* Height-led sizing: the canvas keeps its own export aspect ratio, so a
-     portrait or wide cover never stretches. */
-  height: min(78vh, 720px);
-  width: auto;
-  max-width: 62vw;
-  border-radius: 6px;
-  box-shadow: 0 12px 44px rgba(0, 0, 0, 0.55);
-  cursor: crosshair;
-  touch-action: none;
-}
-
-/* Screenshot mode: ?shot=cover shows the cover alone, edge to edge; the
-   canvas size is set in pixels by shots.js to fit the viewport exactly. */
-body.shot-cover .controls { display: none; }
-body.shot-cover .app { padding: 0; gap: 0; }
-body.shot-cover .stage { position: static; }
-body.shot-cover #cover {
-  width: auto;
-  height: auto;
-  max-width: 100vw;
-  max-height: 100vh;
-  margin: auto;
-  border-radius: 0;
-  box-shadow: none;
-}
-
-@media (max-width: 900px) {
-  .app { flex-direction: column; align-items: center; }
-  .controls { width: min(100%, 560px); }
-  .stage { position: static; }
-  #cover { height: auto; width: min(94vw, 720px); max-width: 94vw; }
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; }
 }
