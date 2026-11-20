@@ -11,17 +11,24 @@ and export it as a PNG to share. Built for the
 
 ## What it does
 
-- **Your photo, your panels.** Load any photo from your machine (file picker,
-  drag-and-drop, or paste). The cover fills three panels with it: one large
-  main panel, one tighter detail crop, and a tagline block — the classic
-  multi-panel poster layout.
-- **Crop and position.** Zoom and shift the photo until the framing is right;
-  the detail panel follows with its own tighter crop automatically.
-- **Bold lettering.** Edit the caption (text, size, height) and the tagline.
-  The title is set huge, white on violet, with a neon-pink shadow and a
-  sunset stripe — all drawn by the app, no font files borrowed from any game.
-- **One-click export.** Export PNG at **1080 × 1080** (square post size).
-  Session B adds 1080 × 1350 and 1920 × 1080.
+- **Three poster layouts.** Vice City Nights (title band, big main panel,
+  detail crop, tagline block), Neon Strip (left-aligned title, two stacked
+  panels, tall right panel, tagline strip), and Sunset Boulevard (full-width
+  hero photo, two small panels, tagline block). Every layout is a different
+  composition, not a recolour — pick the one that fits the photo.
+- **Two photos, per-panel control.** Load a photo into slot A and another
+  into slot B (file picker, drag-and-drop, or paste). Each panel uses either
+  photo, with its own zoom and position; each photo has its own grade
+  (brightness, contrast, saturation). The sunset wash and vignette tie the
+  panels into one poster.
+- **Bold lettering, your words.** Edit the caption (text, font, size,
+  height, colour, outline, neon shadow) and the tagline (text, on/off).
+  Five system fonts, five caption colours — all drawn by the app, no font
+  files borrowed from any game.
+- **Three export sizes.** Export PNG at **1080 × 1080**, **1080 × 1350**,
+  or **1920 × 1080** — the common post sizes, at exact pixel dimensions.
+- **Fast.** Sample photo → pick a layout → caption → export: two clicks to
+  a finished cover. Live preview updates on every change.
 - **Offline, private.** The app is plain static files under `app/`. It makes
   no network request at all, and photos are read on your machine and never
   uploaded anywhere.
@@ -33,11 +40,13 @@ node serve.ts
 # open http://localhost:8080 in desktop Chrome
 ```
 
-1. Load a photo (or press **Use a sample photo** to try one of the three
-   built-in procedural samples: sunset beach, neon street, palm drive).
-2. Adjust zoom / position, edit the caption and tagline.
-3. Press **Export PNG · 1080 × 1080** — the cover downloads as
-   `sunset-cover-1080x1080.png`.
+1. Load a photo (or press **Sample** to try one of the three built-in
+   procedural samples: sunset beach, neon street, palm drive). Load a second
+   photo into slot B for multi-photo covers.
+2. Pick a layout, assign photos to panels, adjust zoom / position / grade.
+3. Edit the caption and tagline — font, size, colour, outline, shadow.
+4. Pick an export size and press **Export PNG** — the cover downloads as
+   `sunset-cover-1080x1080.png` (or `1080x1350` / `1920x1080`).
 
 Hand-in check (what the grader runs):
 
@@ -48,14 +57,29 @@ mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 
 ## How the cover is made
 
-`app/src/cover.js` draws the "Vice City Nights" layout on a 1080 × 1080
-canvas: a violet title band with the caption, the main photo panel with a
-warm sunset grade and vignette, the detail panel with a cyan keyline, white
-panel keylines, and a neon-framed tagline block. `app/src/main.js` wires the
-editor controls and the export. The three sample photos under
-`app/samples/` are drawn procedurally by `tools/gen-samples.mjs` (pure Node,
-no external images): gradient skies, a sun with glow, sea and street
-reflections, building silhouettes with lit windows, and palm silhouettes.
+`app/src/cover.js` draws the cover on canvas: a layout geometry (panel
+rects, title band, tagline block, keylines — all proportional, so every
+layout adapts to every export size), a warm sunset grade and vignette over
+each photo panel, and bold system-font lettering with outline and neon
+shadow. `app/src/main.js` wires the editor: two photo slots, per-panel
+crop, caption editing, layout and size pickers, export. The three sample
+photos under `app/samples/` are drawn procedurally by
+`tools/gen-samples.mjs` (pure Node, no external images): gradient skies, a
+sun with glow, sea and street reflections, building silhouettes with lit
+windows, and palm silhouettes.
+
+Layouts (Baoyu direction: scene type, warm + vivid palette, digital
+rendering, title-only bold text, bold mood):
+
+| Layout | Composition | Lettering |
+| --- | --- | --- |
+| Vice City Nights | Title band, big main panel, detail crop, tagline block | Centred, slight tilt, sunset stripe |
+| Neon Strip | Left-aligned title, two stacked panels, tall right panel, tagline strip | Left-aligned, hot-pink underline bar |
+| Sunset Boulevard | Full-width hero photo, two small panels, tagline block | Centred, gold rule under the title |
+
+Empty states: with no photo loaded the preview says so plainly and export
+refuses with a message; a bad file type is rejected with a message; a panel
+whose photo slot is empty shows a dashed "NO PHOTO" panel instead of a hole.
 
 ## Originality
 
@@ -73,8 +97,8 @@ procedurally generated by the included script.
 | `vendor/makefun-app.ts` | The kit's dossier library, unchanged |
 | `app/index.html` | The editor page |
 | `app/style.css` | Editor styles |
-| `app/src/cover.js` | The cover renderer (layout, grade, lettering) |
-| `app/src/main.js` | Editor wiring, photo loading, export |
+| `app/src/cover.js` | The cover renderer: 3 layouts, grades, lettering |
+| `app/src/main.js` | Editor wiring, photo slots, export sizes, self-test |
 | `app/samples/*.png` | Three procedural sample photos |
 | `tools/gen-samples.mjs` | The sample-photo generator (pure Node PNG encoder) |
 | `screenshots/` | Screenshots of the app at work |

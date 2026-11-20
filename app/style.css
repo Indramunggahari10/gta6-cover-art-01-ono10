@@ -1,5 +1,6 @@
-/* Sunset Cover Studio — editor styles. Dark violet base, sunset orange and
-   neon pink/cyan accents; the editor is a tool, the cover is the star. */
+/* Sunset Cover Studio — editor styles (Session B). Dark violet base,
+   sunset orange and neon pink/cyan accents; the editor is a tool, the
+   cover is the star. */
 * { box-sizing: border-box; }
 
 body {
@@ -56,12 +57,25 @@ body {
   color: #fff;
   font-size: 15px;
 }
+.panel select {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px 10px;
+  border: 1px solid #6b4a9e;
+  border-radius: 5px;
+  background: #12082b;
+  color: #fff;
+  font-size: 15px;
+}
 .panel input[type="range"] { width: 72%; vertical-align: middle; }
 .panel input[type="file"] { display: none; }
+.panel input[type="checkbox"] { width: auto; margin-right: 6px; }
+.check-row { display: inline-block; margin-right: 18px; }
 .hint { color: #b9a8d9; font-size: 13px; }
 .sample-name { color: #22d3ee; font-size: 13px; }
 
-.file-btn, #sampleBtn {
+.file-btn, #sampleA, #sampleB {
   display: inline-block;
   cursor: pointer;
   border: 1px solid #ff3c8c;
@@ -72,9 +86,62 @@ body {
   font-size: 14px;
   margin: 4px 8px 4px 0;
 }
-.file-btn:hover, #sampleBtn:hover { background: #3a1a5e; }
+.file-btn:hover, #sampleA:hover, #sampleB:hover { background: #3a1a5e; }
 
 #dropzone.dragging { border-color: #22d3ee; background: #22124a; }
+
+.slot-row {
+  border-top: 1px solid #3a2364;
+  padding: 8px 0 4px;
+  margin-top: 8px;
+}
+.slot-row strong { color: #ffd166; margin-right: 6px; }
+.slot-row .sample-name { display: block; margin: 4px 0 2px; }
+.grade-row { border-top: 1px solid #3a2364; margin-top: 10px; padding-top: 4px; }
+.grade-row label { display: inline-block; width: 48%; }
+.grade-row label input[type="range"] { width: 62%; }
+.grade-row select { display: inline-block; width: auto; margin-left: 6px; }
+
+.layout-cards { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.layout-card {
+  display: block;
+  cursor: pointer;
+  border: 1px solid #4b2a7d;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #160a2e;
+  margin: 0;
+}
+.layout-card:hover { border-color: #ff3c8c; }
+.layout-card input { accent-color: #ff3c8c; }
+.layout-card strong { display: block; color: #ffe9f4; font-size: 15px; }
+.layout-card span { color: #b9a8d9; font-size: 13px; }
+.layout-card:has(input:checked) {
+  border-color: #ff3c8c;
+  background: #2a1145;
+  box-shadow: 0 0 0 1px #ff3c8c;
+}
+
+.size-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 6px 0 12px; }
+.size-card {
+  display: block;
+  cursor: pointer;
+  border: 1px solid #4b2a7d;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #160a2e;
+  margin: 0;
+  text-align: center;
+}
+.size-card:hover { border-color: #ff3c8c; }
+.size-card input { accent-color: #ff3c8c; }
+.size-card strong { display: block; color: #ffe9f4; font-size: 14px; }
+.size-card span { color: #b9a8d9; font-size: 12px; }
+.size-card:has(input:checked) {
+  border-color: #ff3c8c;
+  background: #2a1145;
+  box-shadow: 0 0 0 1px #ff3c8c;
+}
 
 .export-panel .export-btn {
   display: block;
@@ -113,4 +180,5 @@ body.cover-mode .preview-wrap canvas {
 @media (max-width: 860px) {
   .preview-wrap, .controls { float: none; width: 100%; }
   .masthead h1 { font-size: 26px; }
+  .size-cards { grid-template-columns: 1fr 1fr 1fr; }
 }
