@@ -1,93 +1,79 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sunset Cover Studio — GTA-style cover art maker</title>
-<meta name="description" content="Turn photos and a caption into multi-panel GTA-poster-style cover art with a Vice City sunset or neon grade. Four layouts, three export sizes. Runs offline; photos never leave your machine.">
-<link rel="icon" href="data:,">
-<link rel="stylesheet" href="style.css">
+<title>Sunset Cover Studio</title>
+<meta name="description" content="Turn a photo and a caption into GTA-style multi-panel cover art, offline, in your browser. Photos never leave your machine.">
+<link rel="stylesheet" href="./style.css">
 </head>
 <body>
-<header class="topbar">
-  <h1>Sunset Cover Studio</h1>
-  <p class="tagline">Photos + caption &rarr; GTA-poster-style cover art. Offline. Your photos never leave this machine.</p>
-</header>
+<main class="studio">
+  <header class="masthead">
+    <h1>Sunset Cover Studio</h1>
+    <p class="tagline">Your photo + a caption = Vice City nights cover art. Offline. No upload, ever.</p>
+  </header>
 
-<main class="layout">
-  <section class="stage" aria-label="Cover preview">
-    <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Drop a photo here or click to choose one">
-      <canvas id="preview" width="1080" height="1080" aria-label="Live cover preview"></canvas>
-      <p id="dropHint" class="drop-hint">Drop a photo here, paste one (Ctrl+V), or pick a sample &darr;</p>
-    </div>
-    <p id="photoName" class="photo-name">No photo yet — the panels show the empty state.</p>
-    <p id="status" class="status" role="status"></p>
+  <section class="preview-wrap" aria-label="Cover preview">
+    <canvas id="preview" width="1080" height="1080"></canvas>
+    <p class="preview-note">Live preview — 1080 × 1080 export. The title band, main panel, detail panel and tagline block update as you edit.</p>
   </section>
 
-  <aside class="controls" aria-label="Cover controls">
-    <div class="card">
-      <h2>1 · Photos</h2>
-      <label class="file-btn" for="photoInput">Choose a photo…</label>
-      <input type="file" id="photoInput" accept="image/*" hidden>
-      <p class="hint">Up to 3 photos — each gets its own crop &amp; grade below. Click the preview to choose one, or drag it in.</p>
-      <div class="samples" id="samples" aria-label="Sample photos"></div>
-      <div class="photo-slots" id="photoSlots" aria-label="Loaded photos"></div>
+  <section class="controls" aria-label="Cover controls">
+    <div class="panel" id="dropzone">
+      <h2>1 · Photo</h2>
+      <p>Drop a photo here, paste one, or pick a file. It stays on your machine.</p>
+      <label class="file-btn">Choose a photo
+        <input id="photo" type="file" accept="image/*">
+      </label>
+      <button id="sampleBtn" type="button">Use a sample photo</button>
+      <p class="sample-name" id="sampleName">No photo yet — try a sample.</p>
     </div>
 
-    <div class="card">
-      <h2>2 · Layout</h2>
-      <div class="layouts" id="layouts" role="group" aria-label="Cover layout"></div>
-      <div class="panel-assign" id="panelAssign" aria-label="Which photo goes in each panel"></div>
+    <div class="panel">
+      <h2>2 · Crop &amp; position</h2>
+      <label>Zoom
+        <input id="zoom" type="range" min="100" max="220" value="100" step="1">
+        <span id="zoomVal">100%</span>
+      </label>
+      <label>Move sideways
+        <input id="offsetX" type="range" min="-100" max="100" value="0" step="1">
+      </label>
+      <label>Move up / down
+        <input id="offsetY" type="range" min="-100" max="100" value="0" step="1">
+      </label>
+      <p class="hint">The detail panel (top right) uses a tighter crop of the same photo automatically.</p>
     </div>
 
-    <div class="card">
-      <h2>3 · Caption</h2>
-      <label>Title
-        <input type="text" id="caption" value="VICE CITY NIGHTS" maxlength="24">
+    <div class="panel">
+      <h2>3 · Words</h2>
+      <label>Caption
+        <input id="caption" type="text" maxlength="28" value="Sunset Heist">
       </label>
-      <div class="row-2">
-        <label>Font
-          <select id="captionFont"></select>
-        </label>
-        <label>Colour
-          <select id="captionColor"></select>
-        </label>
-      </div>
-      <label>Title size <output id="captionSizeVal">96px</output>
-        <input type="range" id="captionSize" min="48" max="140" step="2" value="96">
+      <label>Caption size
+        <input id="captionSize" type="range" min="48" max="132" value="92" step="2">
+        <span id="captionSizeVal">92px</span>
       </label>
-      <label>Title height <output id="captionYVal">118px</output>
-        <input type="range" id="captionY" min="60" max="180" step="2" value="118">
+      <label>Caption height
+        <input id="captionY" type="range" min="70" max="150" value="118" step="1">
       </label>
-      <label class="check"><input type="checkbox" id="captionOutline" checked> Dark outline</label>
-      <label class="check"><input type="checkbox" id="captionShadow" checked> Drop shadow</label>
-      <label>Subline
-        <input type="text" id="subline" value="SUNSET BOULEVARD" maxlength="32">
-      </label>
-      <label>Tagline (optional)
-        <input type="text" id="tagline" value="" maxlength="40" placeholder="e.g. A VICE CITY STORY">
+      <label>Tagline
+        <input id="tagline" type="text" maxlength="40" value="Vice City • 2026">
       </label>
     </div>
 
-    <div class="card">
-      <h2>4 · Colour grade</h2>
-      <div class="grades" id="grades" role="group" aria-label="Colour grade"></div>
+    <div class="panel export-panel">
+      <h2>4 · Export</h2>
+      <button id="exportBtn" type="button" class="export-btn">Export PNG · 1080 × 1080</button>
+      <p id="status" role="status">Load a photo to begin.</p>
+      <p class="hint">Session B adds 1080 × 1350 and 1920 × 1080 exports. This build exports the square cover.</p>
     </div>
+  </section>
 
-    <div class="card">
-      <h2>5 · Export</h2>
-      <div class="export-sizes" id="exportSizes" role="radiogroup" aria-label="Export size"></div>
-      <button type="button" id="exportBtn" class="export-btn" disabled>Export PNG — load a photo first</button>
-      <p id="sizeNote" class="size-note"></p>
-      <p class="hint">Fast path: pick a sample &rarr; pick a layout &rarr; edit the caption &rarr; Export. Three clicks to a PNG.</p>
-    </div>
-  </aside>
+  <footer class="foot">
+    <p>Sunset Cover Studio — all lettering and art are original. No Rockstar Games logo, artwork or font is used anywhere. Sample photos are procedurally drawn by the app's own generator.</p>
+  </footer>
 </main>
-
-<footer class="foot">
-  <p>All art, lettering and fonts are original — system fonts only, no Rockstar Games logo, artwork or font. Sample photos are procedurally generated in this repo (<code>tools/make-samples.mjs</code>). Nothing is uploaded: photos are read on your machine and stay there.</p>
-</footer>
-
-<script type="module" src="src/main.js"></script>
+<script type="module" src="./src/main.js"></script>
 </body>
 </html>
