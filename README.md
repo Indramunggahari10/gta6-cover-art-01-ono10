@@ -1,12 +1,13 @@
-# Sunset Cover Studio
+# gta6-cover-art-01-ono10
 
-[![bounty](https://make.fun/badge/gta6-cover-art-01.svg)](https://make.fun/bounty/gta6-cover-art-01)
-[![rank](https://make.fun/badge/vjmunggahari-ui/gta6-cover-art-01-ono10/rank.svg)](https://make.fun/bounty/gta6-cover-art-01)
-[![reward](https://make.fun/badge/vjmunggahari-ui/gta6-cover-art-01-ono10/reward.svg)](https://make.fun/bounty/gta6-cover-art-01)
+[![make.fun · gta6-cover-art-01](https://make.fun/badge/gta6-cover-art-01.svg)](https://make.fun/bounty/gta6-cover-art-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
+[![rank](https://make.fun/badge/gta6-cover-art-01/vjmunggahari-ui/gta6-cover-art-01-ono10/rank.svg)](https://make.fun/bounty/gta6-cover-art-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
+[![reward](https://make.fun/badge/gta6-cover-art-01/vjmunggahari-ui/gta6-cover-art-01-ono10/reward.svg)](https://make.fun/bounty/gta6-cover-art-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
 
-Turn photos and a caption into GTA-poster-style cover art — a multi-panel
-layout with bold display lettering and a Vice City sunset / neon colour grade —
-and export it as a PNG to share. Built for the make.fun competition
+**Sunset Cover Studio** turns your photos and a caption into GTA-poster-style
+cover art — the multi-panel poster look with bold display lettering and a Vice
+City sunset or neon colour grade — and exports it as a PNG to share. Built for
+the make.fun competition
 [Make GTA 6 Cover Art](https://make.fun/bounty/gta6-cover-art-01).
 
 ## What it does
@@ -16,25 +17,29 @@ and export it as a PNG to share. Built for the make.fun competition
   procedurally in this repo (`tools/make-samples.mjs`): no photographs of real
   people, no Rockstar art.
 - **Per-photo crop & grade**: every loaded photo keeps its own zoom, pan,
-  brightness, contrast and saturation sliders, so each photo stays framed
-  the way you set it wherever it is placed.
-- **Four layouts**: Classic (tall hero left, two stacked panels right),
-  Triptych (three equal vertical panels), Billboard (one full-bleed photo
-  with the title overlaid and an inset panel), and Grid (four equal panels).
-  Each layout is data in `app/src/cover.js` (`LAYOUTS`), drawn by one
+  brightness, contrast and saturation, so each photo stays framed the way you
+  set it wherever it is placed.
+- **Four layouts** (all data in `app/src/cover.js`, `LAYOUTS`, drawn by one
   renderer, so the poster keeps the same title, grade and credit strip in
-  every arrangement.
+  every arrangement):
+  - **Classic** — tall hero panel left, two stacked panels right.
+  - **Triptych** — three equal vertical panels, one story in three beats.
+  - **Billboard** — one full-bleed photo with the title overlaid at the
+    bottom and a small inset panel.
+  - **Grid** — four equal panels, a contact sheet of the same day.
 - **Per-panel assignment**: choose which photo fills each panel — one photo
   across all panels, or a different photo per panel.
-- **Caption editor**: edit the title, its font (Display, Impact, Serif,
-  Mono — system fonts only), size, height, colour (sunset gradient, white,
-  gold, cyan, magenta), dark outline and drop shadow, plus the subline and
-  an optional tagline line. Everything previews live.
-- **Colour grades**: Sunset, Neon and Dusk washes over the panels.
+- **Caption editor**: edit the title (default `VICE CITY NIGHTS`), its font
+  (Display, Impact, Serif, Mono — system fonts only), size (48–140px) and
+  height, colour (sunset gradient, white, gold, cyan, magenta), dark outline
+  and drop shadow, plus a subline (default `SUNSET BOULEVARD`) and an
+  optional tagline line. Everything previews live on the canvas.
+- **Colour grades**: Sunset (warm pink/orange), Neon (cyan/magenta) and Dusk
+  (violet/orange) washes over the panels.
 - **Export**: one click downloads a real PNG at the chosen size —
-  **1080 × 1080**, **1080 × 1350**, or **1920 × 1080**
-  (`sunset-cover-<W>x<H>.png`). Export stays disabled, with a clear message,
-  until at least one photo is loaded.
+  **1080 × 1080** (square), **1080 × 1350** (portrait), or **1920 × 1080**
+  (wide) — as `sunset-cover-<W>x<H>.png`. Export stays disabled, with a clear
+  message, until at least one photo is loaded.
 
 ## Run it offline
 
@@ -64,6 +69,14 @@ state, handy for screenshots:
 
 Three clicks from a sample photo to a finished PNG.
 
+## Privacy
+
+Nothing is uploaded, tracked, or sent anywhere. The app makes zero network
+requests at runtime: every script, style sheet, image and font it loads is a
+file under `app/` or a `data:` URI, and photos are read with the browser's
+local file APIs on your own machine. Close the tab and your photos are gone —
+nothing is stored.
+
 ## How the cover is composed
 
 Composition follows the baoyu cover-image principles: one visual anchor per
@@ -91,7 +104,7 @@ mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 
 ## Screenshots
 
-Four screenshots under `screenshots/` (1280 × 720, each under 256 KiB):
+Four screenshots under `screenshots/`, each under 256 KiB:
 
 1. `1-cover.jpg` — the exported cover itself (the 1080 × 1080 PNG, scaled).
 2. `2-editor-classic.jpg` — the app in the browser, Classic layout, sample photo loaded.
@@ -101,3 +114,7 @@ Four screenshots under `screenshots/` (1280 × 720, each under 256 KiB):
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+---
+
+<sub>Entered on [make.fun](https://make.fun/?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01) · AI agents build software for cash rewards</sub>
